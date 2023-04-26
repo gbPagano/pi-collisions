@@ -14,6 +14,7 @@ class Square(pg.Rect):
         self.velocity = 0.
         self.acceleration = 0
         self.real_x = position[0]
+        self.collisions_counter = 0
     
     def move(self, dt):
         
@@ -24,8 +25,40 @@ class Square(pg.Rect):
 
     def update_real_x(self):
         self.real_x = self.x
-        
 
+    def check_collisions(self, objects):
+        for obj in objects:
+            if self.colliderect(obj):
+                print(self.x, obj.x, self.velocity, obj.velocity)
+                if obj.mass == float("inf"):
+                    self.velocity *= -1
+                else:
+                    self.apply_collision(obj)
+
+
+    def apply_collision(self, obj):
+        self.collisions_counter += 1
+        
+        # if self.velocity >= 0:
+        #     self.right = obj.left
+        # else:
+        #     self.left = obj.right
+
+ 
+
+        
+        # self.update_real_x()
+        
+        mass_sum = self.mass + obj.mass
+
+        vel_self = (((self.mass - obj.mass) / (mass_sum)) * self.velocity) + ((2*obj.mass / (mass_sum)) * obj.velocity)
+        vel_obj = (((obj.mass - self.mass) / (mass_sum)) * obj.velocity) + ((2*self.mass / (mass_sum)) * self.velocity)
+
+        # print("antes:", self.velocity * self.mass + obj.velocity * obj.mass)
+        # print("depois:", vel_self * self.mass + vel_obj * obj.mass)
+
+        self.velocity = round(vel_self, 4)
+        obj.velocity = round(vel_obj, 4)
 
 
 
@@ -37,14 +70,11 @@ def main():
     clock = pg.time.Clock()
     
     collisions = 0
+    wall = Square((0, 0), (50, 1000), float("inf"))
+    square_1 = Square((200, 200), (50, 50), 1)
 
-    test = Square((200, 200), (150, 150), 1)
-    test.velocity = 0
-    test.acceleration = 0
-
-    test2 = Square((600, 200), (150,150), 100**2)
-    test2.velocity = -100
-    test2.acceleration = 0
+    square_2 = Square((300, 200), (50,50), 100**3)
+    square_2.velocity = -100
     # main loop
     running = True
     while running:
@@ -58,52 +88,53 @@ def main():
                 return pg.quit()
 
         screen.fill(BACKGROUND_COLOR)
-        counter = 0
 
-        test.move(dt)
-        test2.move(dt)
+        square_2.move(dt)
+        square_1.move(dt)
+        if square_1.colliderect(square_2):
+            collisions += 1
+            square_1.apply_collision(square_2)
+            square_1.right = square_2.left
+            square_1.update_real_x()
+
+        if square_1.colliderect(wall):
+            collisions += 1
+            square_1.velocity *= -1
+            square_1.left = wall.right
+            square_1.update_real_x()
+
+        if square_2.x < square_1.width + wall.width:
+            square_2.x = square_1.width + wall.width
+            square_2.update_real_x()
+
+        # square_2.move(dt)
+        # if square_1.colliderect(square_2):
+        #     collisions += 1
+        #     square_1.apply_collision(square_2)
+        #     square_1.right = square_2.left
+        #     square_1.update_real_x()
+
+        # if square_1.colliderect(wall):
+        #     collisions += 1
+        #     square_1.velocity *= -1
+        #     square_1.left = wall.right
+        #     square_1.update_real_x()
+
+        # if square_2.x < square_1.width + wall.width:
+        #     square_2.x = square_1.width + wall.width
+        #     square_2.update_real_x()
         
-        check_collision(test, test2)
-
-        wall = Square((0, 0), (50, 1000), 0)
-
-
-        if counter: 
-            collisions += counter
-            print(collisions)
-            print(test.velocity, test2.velocity)
-
+        print(collisions) 
+        print(square_1.velocity)
         pg.draw.rect(screen, (255,0,0), wall)
-        pg.draw.rect(screen, SQUARE_COLOR_2, test2)
-        pg.draw.rect(screen, SQUARE_COLOR, test)
+        pg.draw.rect(screen, SQUARE_COLOR_2, square_2)
+        pg.draw.rect(screen, SQUARE_COLOR, square_1)
 
         pg.display.set_caption(f"fps: {round(clock.get_fps(), 2)}")
         pg.display.flip()
         
 
     pg.quit()
-
-
-def check_collision(obj_a, obj_b):
-    if obj_a.colliderect(obj_b):
-        #counter += 1
-        # print(obj_a.x, obj_b.x - obj_b.width)
-        print("bloco")
-
-        obj_a.right = obj_b.left
-        obj_b.update_real_x()
-        obj_a.update_real_x()
-        
-        mass_sum = obj_a.mass + obj_b.mass
-
-        vel_obj_a = (((obj_a.mass - obj_b.mass) / (mass_sum)) * obj_a.velocity) + ((2*obj_b.mass / (mass_sum)) * obj_b.velocity)
-        vel_obj_b = (((obj_b.mass - obj_a.mass) / (mass_sum)) * obj_b.velocity) + ((2*obj_a.mass / (mass_sum)) * obj_a.velocity)
-
-        # print("antes:", obj_a.velocity * obj_a.mass + obj_b.velocity * obj_b.mass)
-        # print("depois:", vel_obj_a * obj_a.mass + vel_obj_b * obj_b.mass)
-
-        obj_a.velocity = round(vel_obj_a, 4)
-        obj_b.velocity = round(vel_obj_b, 4)
 
 
 
