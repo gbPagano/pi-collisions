@@ -3,33 +3,49 @@ import pygame as pg
 
 FPS = 144
 BACKGROUND_COLOR = pg.Color(40, 42, 54)
+SQUARE_COLOR = (0, 0, 255)
+SQUARE_COLOR_2 = (0, 255, 0)
 
 
 class Square(pg.Rect):
     def __init__(self, position, dimensions, mass):
         super().__init__(position, dimensions)
         self.mass = mass
-        self.velocity = 0
+        self.velocity = 0.
         self.acceleration = 0
-        self.position_x = 200
+        self.real_x = position[0]
+    
+    def move(self, dt):
+        
+        self.velocity += self.acceleration * dt
+        self.real_x += self.velocity * dt
+
+        self.x = self.real_x
+        
 
 
-import time
+
+
+
+
 def main():
     pg.init()
     screen = pg.display.set_mode((1280, 720))
     clock = pg.time.Clock()
-    delta_time = 0
 
 
-    test = Square((200, 200), (50, 50), 50)
+    test = Square((200, 200), (150, 150), 50)
+    test.velocity = 250
+    test.acceleration = 0
 
+    test2 = Square((800, 200), (150,150), 250)
+    test2.velocity = -50
+    test2.acceleration = 0
     # main loop
-    a = time.time()
     running = True
     while running:
         clock.tick(FPS)
-        dt2 = clock.get_time() / 1000
+        dt = clock.get_time() / 1000  # millisec to sec
 
         for event in pg.event.get():
             if event.type == pg.QUIT or (
@@ -40,25 +56,22 @@ def main():
         screen.fill(BACKGROUND_COLOR)
 
 
-        # print(dt)
-        # print(dt2)
-        # print(clock.get_time())
+        test.move(dt)
+        test2.move(dt)
         
-        # print(test.x, test.y)
-        pg.draw.rect(screen, (0, 0, 255), test)
+        if test.colliderect(test2):
 
-        test.position_x += 600 * dt2
-        # test.move_ip(200 * dt2, 0)
-        test.x = test.position_x
-        # print(delta_time)
-        if test.x > 800: 
-            b = time.time() - a
-            print(b)
-            print(test.position_x)
-            print(test.x)
-            print((test.position_x  - 200) / b)
-            break
-        
+            test.x = test2.x - test2.width
+            
+            vel_test = (((test.mass - test2.mass) / (test.mass + test2.mass)) * test.velocity) + ((2*test2.mass / (test.mass + test2.mass)) * test2.velocity)
+            vel_test2 = (((test2.mass - test.mass) / (test.mass + test2.mass)) * test2.velocity) + ((2*test.mass / (test.mass + test2.mass)) * test.velocity) 
+
+            test.velocity = vel_test
+            test2.velocity = vel_test2
+            
+
+        pg.draw.rect(screen, SQUARE_COLOR_2, test2)
+        pg.draw.rect(screen, SQUARE_COLOR, test)
 
         pg.display.set_caption(f"fps: {round(clock.get_fps(), 2)}")
         pg.display.flip()
