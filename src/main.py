@@ -68,13 +68,14 @@ def main():
     pg.init()
     screen = pg.display.set_mode((1280, 720))
     clock = pg.time.Clock()
-    
+    pg.mixer.music.load("data/collision_song.mp3") 
     collisions = 0
     wall = Square((0, 0), (50, 1000), float("inf"))
     square_1 = Square((200, 200), (50, 50), 1)
+    
 
-    square_2 = Square((300, 200), (50,50), 100**3)
-    square_2.velocity = -100
+    square_2 = Square((300, 200), (50,50), 100**2)
+    square_2.velocity = -50
     # main loop
     running = True
     while running:
@@ -89,23 +90,27 @@ def main():
 
         screen.fill(BACKGROUND_COLOR)
 
-        square_2.move(dt)
-        square_1.move(dt)
-        if square_1.colliderect(square_2):
-            collisions += 1
-            square_1.apply_collision(square_2)
-            square_1.right = square_2.left
-            square_1.update_real_x()
+        x = 10
+        for _ in range(x):
+            square_2.move(dt / x)
+            square_1.move(dt / x)
+            if square_1.colliderect(square_2):
+                pg.mixer.music.play()
+                collisions += 1
+                square_1.apply_collision(square_2)
+                square_1.right = square_2.left
+                square_1.update_real_x()
 
-        if square_1.colliderect(wall):
-            collisions += 1
-            square_1.velocity *= -1
-            square_1.left = wall.right
-            square_1.update_real_x()
+            if square_1.colliderect(wall):
+                pg.mixer.music.play()
+                collisions += 1
+                square_1.velocity *= -1
+                square_1.left = wall.right
+                square_1.update_real_x()
 
-        if square_2.x < square_1.width + wall.width:
-            square_2.x = square_1.width + wall.width
-            square_2.update_real_x()
+            if square_2.x < square_1.width + wall.width:
+                square_2.x = square_1.width + wall.width
+                square_2.update_real_x()
 
         # square_2.move(dt)
         # if square_1.colliderect(square_2):
@@ -125,7 +130,7 @@ def main():
         #     square_2.update_real_x()
         
         print(collisions) 
-        print(square_1.velocity)
+        print(not (square_1.velocity > 0 and square_1.velocity < square_2.velocity))
         pg.draw.rect(screen, (255,0,0), wall)
         pg.draw.rect(screen, SQUARE_COLOR_2, square_2)
         pg.draw.rect(screen, SQUARE_COLOR, square_1)
