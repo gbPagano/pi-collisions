@@ -1,16 +1,18 @@
-import pygame, time
+import time
+
+import pygame
 
 ################################# LOAD UP A BASIC WINDOW AND CLOCK #################################
 pygame.init()
 pygame.font.init()
-font = pygame.font.SysFont('Calibri',40)
+font = pygame.font.SysFont("Calibri", 40)
 DISPLAY_W, DISPLAY_H = 480, 270
-canvas = pygame.Surface((DISPLAY_W,DISPLAY_H))
-window = pygame.display.set_mode(((DISPLAY_W,DISPLAY_H)))
+canvas = pygame.Surface((DISPLAY_W, DISPLAY_H))
+window = pygame.display.set_mode(((DISPLAY_W, DISPLAY_H)))
 running = True
 clock = pygame.time.Clock()
 TARGET_FPS = 60
-WHITE = (255,255,255)
+WHITE = (255, 255, 255)
 ################################# LOAD VARIABLES AND OBJECTS###################################
 rect_pos = 0
 timer = 0
@@ -20,7 +22,7 @@ dt = 0
 record = 0
 passed, start = False, False
 FPS = 140
-#TARGET_FPS = 60
+# TARGET_FPS = 60
 ################################# GAME LOOP ##########################
 while running:
     # Limit framerate
@@ -30,7 +32,7 @@ while running:
     now = time.time()
     dt = now - prev_time
     prev_time = now
-    
+
     rect_pos2 = rect_pos
     # Update the timer and move the rectangle
     if start:
@@ -56,18 +58,21 @@ while running:
         quit()
 
     ################################# UPDATE/ Animate SPRITE #################################
-    countdown = font.render("Time: " +str(round(timer,5)), False, (255,255,255))
+    countdown = font.render("Time: " + str(round(timer, 5)), False, (255, 255, 255))
 
-    fps_text = font.render("FPS: " +str(round(clock.get_fps(),2)), False, (255,255,255))
+    fps_text = font.render(
+        "FPS: " + str(round(clock.get_fps(), 2)), False, (255, 255, 255)
+    )
 
-    
     ################################# UPDATE WINDOW AND DISPLAY #################################
-    canvas.fill((0, 0, 0)) # Fills the entire screen with light blue
-    canvas.blit(countdown, (0,0))
+    canvas.fill((0, 0, 0))  # Fills the entire screen with light blue
+    canvas.blit(countdown, (0, 0))
     canvas.blit(fps_text, (0, 50))
-    pygame.draw.rect(canvas,WHITE,(rect_pos,DISPLAY_H/2 + 30,40,40))
+    pygame.draw.rect(canvas, WHITE, (rect_pos, DISPLAY_H / 2 + 30, 40, 40))
     if record:
-        record_text = font.render("Time: " +str(round(record,5)), False, (255,255,255))
-        canvas.blit(record_text, (DISPLAY_W/4, DISPLAY_H/2))
-    window.blit(canvas, (0,0))
+        record_text = font.render(
+            "Time: " + str(round(record, 5)), False, (255, 255, 255)
+        )
+        canvas.blit(record_text, (DISPLAY_W / 4, DISPLAY_H / 2))
+    window.blit(canvas, (0, 0))
     pygame.display.update()
