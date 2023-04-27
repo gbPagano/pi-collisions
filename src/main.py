@@ -53,7 +53,7 @@ def main():
     pg.init()
     screen = pg.display.set_mode((1280, 720))
     clock = pg.time.Clock()
-    pg.mixer.music.load("data/collision_song.mp3")
+    sound_collision = pg.mixer.Sound("data/collision_song.mp3")
     collisions = 0
     wall = Square((0, 0), (50, 1000), float("inf"))
     square_1 = Square((200, 200), (50, 50), 1)
@@ -79,14 +79,14 @@ def main():
             square_2.move(dt / x)
             square_1.move(dt / x)
             if square_1.colliderect(square_2):
-                pg.mixer.music.play()
+                sound_collision.play()
                 collisions += 1
                 square_1.apply_collision(square_2)
                 square_1.right = square_2.left
                 square_1.update_real_x()
 
             if square_1.colliderect(wall):
-                pg.mixer.music.play()
+                sound_collision.play()
                 collisions += 1
                 square_1.velocity *= -1
                 square_1.left = wall.right
