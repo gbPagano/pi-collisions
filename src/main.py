@@ -59,7 +59,7 @@ def main():
     square_1 = Square((200, 200), (50, 50), 1)
 
     square_2 = Square((300, 200), (50, 50), 100**2)
-    square_2.velocity = -50
+    square_2.velocity = -100
     # main loop
     running = True
     while running:
@@ -78,14 +78,14 @@ def main():
         for _ in range(x):
             square_2.move(dt / x)
             square_1.move(dt / x)
-            if square_1.colliderect(square_2):
+            if square_1.colliderect(square_2) or square_1.right > square_2.left:
                 sound_collision.play()
                 collisions += 1
                 square_1.apply_collision(square_2)
                 square_1.right = square_2.left
                 square_1.update_real_x()
 
-            if square_1.colliderect(wall):
+            if square_1.colliderect(wall) or square_1.left  < wall.right:
                 sound_collision.play()
                 collisions += 1
                 square_1.velocity *= -1
